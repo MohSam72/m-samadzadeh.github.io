@@ -3,297 +3,702 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mohsen Samadzadeh | Physicist & Researcher</title>
+    <title>Mohsen Samadzadeh | Optical Tweezers & Photonics Lab</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent: #38bdf8;
-            --accent-hover: #0ea5e9;
-            --border: #334155;
-            --code-font: 'JetBrains Mono', monospace;
+            --bg-dark: #080c14;
+            --bg-card: rgba(16, 24, 40, 0.7);
+            --border-glow: rgba(56, 189, 248, 0.25);
+            --laser-cyan: #38bdf8;
+            --laser-blue: #2563eb;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --font-main: 'Inter', sans-serif;
+            --font-code: 'JetBrains Mono', monospace;
         }
 
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            line-height: 1.65;
-            padding: 0 1rem;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            overflow-x: hidden;
+            line-height: 1.6;
         }
 
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 3rem 1rem;
+        /* Canvas Background for Laser/Particle Trap Simulation */
+        #physicsCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: all;
         }
 
-        /* Profile Header */
-        header {
+        .overlay-content {
+            position: relative;
+            z-index: 10;
+            background: linear-gradient(180deg, rgba(8, 12, 20, 0.78) 0%, rgba(8, 12, 20, 0.94) 100%);
+            min-height: 100vh;
+        }
+
+        /* Header Navigation */
+        nav {
+            position: sticky;
+            top: 0;
+            backdrop-filter: blur(16px);
+            background: rgba(8, 12, 20, 0.85);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            padding-bottom: 2.5rem;
-            border-bottom: 1px solid var(--border);
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem 4rem;
+            z-index: 100;
         }
 
-        @media (min-width: 640px) {
-            header {
-                flex-direction: row;
-                align-items: center;
-                justify-content: space-between;
-            }
-        }
-
-        .profile-title h1 {
-            font-size: 2.2rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            color: #ffffff;
-        }
-
-        .profile-title p {
-            font-size: 1.1rem;
-            color: var(--accent);
-            margin-top: 0.25rem;
-        }
-
-        .affiliation {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            margin-top: 0.25rem;
-        }
-
-        .social-links {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .social-links a {
-            color: var(--text-muted);
+        .nav-brand {
+            font-weight: 800;
             font-size: 1.25rem;
-            transition: color 0.2s ease, transform 0.2s ease;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
             text-decoration: none;
         }
 
-        .social-links a:hover {
-            color: var(--accent);
+        .nav-brand span {
+            color: var(--laser-cyan);
+            text-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--laser-cyan);
+            text-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 4rem 2rem;
+            position: relative;
+        }
+
+        .badge {
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid var(--border-glow);
+            padding: 0.4rem 1.2rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            color: var(--laser-cyan);
+            margin-bottom: 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: var(--font-code);
+        }
+
+        .badge-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--laser-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--laser-cyan);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.85); }
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.15;
+            max-width: 900px;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #38bdf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 750px;
+            margin-bottom: 2.5rem;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1.2rem;
+        }
+
+        .btn {
+            padding: 0.85rem 1.8rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--laser-blue), var(--laser-cyan));
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(56, 189, 248, 0.3);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 28px rgba(56, 189, 248, 0.5);
+        }
+
+        .btn-outline {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--text-primary);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--laser-cyan);
+            background: rgba(56, 189, 248, 0.05);
             transform: translateY(-2px);
         }
 
-        /* Sections */
-        section {
-            padding: 2.5rem 0;
-            border-bottom: 1px solid var(--border);
+        /* Container & Section */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 5rem 2rem;
         }
 
-        section:last-of-type {
-            border-bottom: none;
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
         }
 
-        h2 {
+        .section-header h2 {
+            font-size: 2.3rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            color: #fff;
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Cards & Grids */
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 2.2rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--laser-cyan), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            border-color: var(--border-glow);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            color: var(--laser-cyan);
+            margin-bottom: 1.2rem;
+            display: inline-block;
+        }
+
+        .card h3 {
             font-size: 1.35rem;
-            font-weight: 600;
-            color: #ffffff;
-            margin-bottom: 1.25rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            margin-bottom: 0.8rem;
+            color: #fff;
         }
 
-        h2 i {
-            color: var(--accent);
-            font-size: 1.1rem;
+        .card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
         }
 
-        /* Research Interests Badges */
-        .tags {
+        /* Interactive Simulator Box */
+        .interactive-box {
+            background: rgba(13, 19, 33, 0.85);
+            border: 1px solid var(--border-glow);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin: 3rem 0;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(12px);
+        }
+
+        .sim-controls {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.6rem;
-            margin-top: 0.75rem;
+            gap: 2rem;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        .tag {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            padding: 0.35rem 0.85rem;
-            border-radius: 9999px;
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-
-        /* Cards & Lists */
-        .item-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1.25rem;
-            margin-bottom: 1rem;
-            transition: border-color 0.2s ease;
-        }
-
-        .item-card:hover {
-            border-color: var(--accent);
-        }
-
-        .item-card h3 {
-            font-size: 1.05rem;
-            font-weight: 600;
-            margin-bottom: 0.35rem;
-        }
-
-        .item-meta {
-            font-size: 0.85rem;
-            color: var(--accent);
-            margin-bottom: 0.5rem;
-            font-family: var(--code-font);
-        }
-
-        .item-desc {
-            font-size: 0.92rem;
-            color: var(--text-muted);
-        }
-
-        /* Contact Section */
-        .contact-box {
-            background: linear-gradient(145deg, #1e293b, #0f172a);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1.5rem;
-        }
-
-        .contact-line {
+        .control-group {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 0.75rem;
-            color: var(--text-muted);
-            font-size: 0.95rem;
+            gap: 12px;
+            font-family: var(--font-code);
+            font-size: 0.88rem;
+            color: var(--laser-cyan);
         }
 
-        .contact-line i {
-            color: var(--accent);
-            width: 20px;
+        .control-group input[type="range"] {
+            accent-color: var(--laser-cyan);
+            cursor: pointer;
         }
 
-        .contact-line a {
-            color: var(--text-main);
+        /* Experimental Data Benchmarks */
+        .benchmarks {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .metric-card .value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            font-family: var(--font-code);
+            color: var(--laser-cyan);
+            margin: 0.5rem 0;
+        }
+
+        .metric-card .label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 3rem 2rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            background: #05080e;
+        }
+
+        footer a {
+            color: var(--laser-cyan);
             text-decoration: none;
         }
 
-        .contact-line a:hover {
-            color: var(--accent);
-            text-decoration: underline;
-        }
-
-        footer {
-            text-align: center;
-            padding: 2rem 0;
-            font-size: 0.85rem;
-            color: var(--text-muted);
+        @media (max-width: 768px) {
+            nav { padding: 1rem 1.5rem; }
+            .hero h1 { font-size: 2.3rem; }
+            .nav-links { display: none; }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <!-- Header -->
-    <header>
-        <div class="profile-title">
-            <h1>Mohsen Samadzadeh</h1>
-            <p>PhD Candidate in Optics & Lasers</p>
-            <div class="affiliation">
-                Institute for Advanced Studies in Basic Sciences (IASBS), Zanjan, Iran
+    <!-- Interactive Optical Physics Simulation Canvas -->
+    <canvas id="physicsCanvas"></canvas>
+
+    <div class="overlay-content">
+        <!-- Navigation -->
+        <nav>
+            <a href="#" class="nav-brand">
+                <i class="fa-solid fa-atom"></i>
+                <span>Mohsen Samadzadeh</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="#about">About</a></li>
+                <li><a href="#research">Research Focus</a></li>
+                <li><a href="#simulation">Optical Trap Lab</a></li>
+                <li><a href="#experiments">Data & Benchmarks</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="badge">
+                <div class="badge-dot"></div>
+                IASBS Optics & Laser Physics Laboratory
             </div>
-            <div class="social-links">
-                <a href="https://scholar.google.com" target="_blank" title="Google Scholar"><i class="fa-solid fa-graduation-cap"></i></a>
-                <a href="https://orcid.org" target="_blank" title="ORCID"><i class="fa-brands fa-orcid"></i></a>
-                <a href="https://github.com" target="_blank" title="GitHub"><i class="fa-brands fa-github"></i></a>
-                <a href="mailto:m.samadzadeh@iasbs.ac.ir" title="Email"><i class="fa-solid fa-envelope"></i></a>
-            </div>
-        </div>
-    </header>
-
-    <!-- About -->
-    <section>
-        <h2><i class="fa-solid fa-user"></i> About Me</h2>
-        <p>
-            I am a researcher and PhD candidate specializing in classical and physical optics, laser beam shaping, and particle dynamics. My research primarily centers on optical trapping mechanisms, dynamics of micro-particles in circular optical traps, and power-efficiency optimization using spatial light modulators (SLM) and specialized phase plates (SPAAPS/FGPAAPS).
-        </p>
-    </section>
-
-    <!-- Research Interests -->
-    <section>
-        <h2><i class="fa-solid fa-atom"></i> Research Interests</h2>
-        <div class="tags">
-            <span class="tag">Optical Tweezers & Trapping</span>
-            <span class="tag">Laguerre-Gaussian (LG) Beams</span>
-            <span class="tag">Photonic Crystals</span>
-            <span class="tag">Orbital Angular Momentum (OAM)</span>
-            <span class="tag">Spatial Light Modulators (SLM)</span>
-            <span class="tag">Computational Optics & MATLAB Modeling</span>
-        </div>
-    </section>
-
-    <!-- Key Research & Projects -->
-    <section>
-        <h2><i class="fa-solid fa-flask"></i> Highlighted Research</h2>
-
-        <div class="item-card">
-            <h3>Dynamics of Orbiting Particles in Circular Optical Traps</h3>
-            <div class="item-meta">Particle Dynamics & Hydrodynamic Interactions</div>
-            <p class="item-desc">
-                Investigating two-particle encounters in circular optical potential wells. Analyzing localized orbital accelerations and relative hydrodynamic coupling forces during close-proximity interactions.
+            <h1>Laser Tweezers & Optical Manipulation Dynamics</h1>
+            <p>
+                Investigating hydrodynamic interactions, orbital trapping dynamics of micro-particles in circular optical traps, and phase-engineered Laguerre-Gaussian vortex beams.
             </p>
-        </div>
-
-        <div class="item-card">
-            <h3>Comparative Analysis of Structured Light Generation</h3>
-            <div class="item-meta">Experimental Laser Optics</div>
-            <p class="item-desc">
-                Systematic efficiency benchmarking among Spatial Phase Apertures (SPAAPS), Fractional Graded-Phase Apertures (FGPAAPS), and Phase-only Spatial Light Modulators (SLM) for ring and vortex beam generation.
-            </p>
-        </div>
-    </section>
-
-    <!-- Contact Details -->
-    <section>
-        <h2><i class="fa-solid fa-paper-plane"></i> Contact</h2>
-        <div class="contact-box">
-            <div class="contact-line">
-                <i class="fa-solid fa-location-dot"></i>
-                <span>Optics & Photonics Laboratory, Department of Physics, IASBS, Zanjan, Iran</span>
+            <div class="cta-buttons">
+                <a href="#simulation" class="btn btn-primary">
+                    <i class="fa-solid fa-flask"></i> Interactive Trap Demo
+                </a>
+                <a href="#research" class="btn btn-outline">
+                    <i class="fa-solid fa-book-open"></i> Research Details
+                </a>
             </div>
-            <div class="contact-line">
-                <i class="fa-solid fa-envelope"></i>
-                <a href="mailto:m.samadzadeh@iasbs.ac.ir">m.samadzadeh@iasbs.ac.ir</a>
-            </div>
-            <div class="contact-line">
-                <i class="fa-solid fa-globe"></i>
-                <span>Available for international postdoctoral inquiries & collaborative projects.</span>
-            </div>
-        </div>
-    </section>
+        </section>
 
-    <footer>
-        &copy; 2026 Mohsen Samadzadeh &bull; Hosted on GitHub Pages / IASBS Web
-    </footer>
-</div>
+        <!-- Research Highlights -->
+        <section id="research" class="container">
+            <div class="section-header">
+                <h2>Research Domains</h2>
+                <p>Advancing optical manipulation from fundamental physics to multi-particle orbital dynamics</p>
+            </div>
 
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-ring"></i></div>
+                    <h3>Circular Optical Tweezers</h3>
+                    <p>
+                        High-precision confinement and dynamic orbital steering of micro-particles trapped within laser rings, analyzing acceleration regimes during close pairwise encounters.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-wave-square"></i></div>
+                    <h3>Laguerre-Gaussian Beams</h3>
+                    <p>
+                        Generation and propagation of orbital angular momentum (OAM) carrying optical vortices via Spatial Light Modulators (SLM) and specialized phase plates.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-network-wired"></i></div>
+                    <h3>Hydrodynamic Coupling</h3>
+                    <p>
+                        Experimental study of hydrodynamic cross-talk and viscosity-damped interactions when two microscopic particles navigate shared optical trapping landscapes.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Trap Simulator -->
+        <section id="simulation" class="container">
+            <div class="section-header">
+                <h2>Interactive Optical Vortex Trap</h2>
+                <p>Move your mouse over the canvas or tweak the optical potential controls below</p>
+            </div>
+
+            <div class="interactive-box">
+                <div style="text-align: center; max-width: 700px; margin: 0 auto 1.5rem auto;">
+                    <p style="color: var(--text-primary); font-size: 1.05rem;">
+                        <strong>Real-time 2D Simulation:</strong> Particles trapped within a circular potential well driven by tangential radiation pressure (OAM transfer).
+                    </p>
+                    <p style="color: var(--text-secondary); font-size: 0.88rem; margin-top: 6px;">
+                        Interactive tip: Move your cursor across the screen to introduce a steering gradient force on the orbital particles.
+                    </p>
+                </div>
+
+                <div class="sim-controls">
+                    <div class="control-group">
+                        <label for="trapRadius">Trap Radius (R):</label>
+                        <input type="range" id="trapRadius" min="80" max="250" value="160">
+                    </div>
+                    <div class="control-group">
+                        <label for="angularSpeed">Orbital Torque:</label>
+                        <input type="range" id="angularSpeed" min="1" max="10" value="4">
+                    </div>
+                    <div class="control-group">
+                        <label for="particleCount">Particles:</label>
+                        <input type="range" id="particleCount" min="2" max="8" value="2">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Experimental Data & Apparatus -->
+        <section id="experiments" class="container">
+            <div class="section-header">
+                <h2>Optical Benchmarks & Setups</h2>
+                <p>Comparative efficiency and stability analysis across three optical architectures</p>
+            </div>
+
+            <div class="benchmarks">
+                <div class="metric-card">
+                    <div class="label">FGPAAPS Configuration</div>
+                    <div class="value">2.46%</div>
+                    <div class="label">&plusmn; 0.03% Relative Optical Power</div>
+                </div>
+                <div class="metric-card">
+                    <div class="label">SPAAPS Setup</div>
+                    <div class="value">Stable</div>
+                    <div class="label">Phase-Averaged Vortex Profile</div>
+                </div>
+                <div class="metric-card">
+                    <div class="label">SLM Phase Shaping</div>
+                    <div class="value">High Res</div>
+                    <div class="label">Dynamic Computer-Generated Holography</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="container">
+            <div class="section-header">
+                <h2>Get in Touch</h2>
+                <p>Open for collaborative research, postdoctoral inquiries, and optical simulation discussions</p>
+            </div>
+
+            <div style="text-align: center;">
+                <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+                    Institute for Advanced Studies in Basic Sciences (IASBS), Zanjan, Iran
+                </p>
+                <div class="cta-buttons" style="justify-content: center;">
+                    <a href="mailto:m.samadzadeh@iasbs.ac.ir" class="btn btn-primary">
+                        <i class="fa-solid fa-envelope"></i> Send Email
+                    </a>
+                    <a href="https://github.com/MohSam72" target="_blank" class="btn btn-outline">
+                        <i class="fa-brands fa-github"></i> GitHub Profile
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <p>&copy; 2026 Mohsen Samadzadeh. Inspired by Space Tweezers Research & Optical Physics.</p>
+        </footer>
+    </div>
+
+    <!-- Simulation Script -->
+    <script>
+        const canvas = document.getElementById('physicsCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            center.x = width / 2;
+            center.y = height / 2;
+        });
+
+        const center = { x: width / 2, y: height / 2 };
+        let mouse = { x: -1000, y: -1000, active: false };
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+            mouse.active = true;
+        });
+
+        window.addEventListener('mouseleave', () => {
+            mouse.active = false;
+        });
+
+        // Parameters
+        let trapRadius = 160;
+        let speedMultiplier = 0.02;
+        let numParticles = 2;
+
+        document.getElementById('trapRadius').addEventListener('input', (e) => {
+            trapRadius = parseFloat(e.target.value);
+        });
+
+        document.getElementById('angularSpeed').addEventListener('input', (e) => {
+            speedMultiplier = parseFloat(e.target.value) * 0.005;
+        });
+
+        document.getElementById('particleCount').addEventListener('input', (e) => {
+            numParticles = parseInt(e.target.value);
+            initParticles();
+        });
+
+        class Particle {
+            constructor(theta) {
+                this.theta = theta;
+                this.radialOffset = 0;
+                this.speed = speedMultiplier;
+                this.radius = 7;
+                this.trail = [];
+            }
+
+            update(particles, index) {
+                // Orbital propulsion
+                this.theta += speedMultiplier;
+
+                // Hydrodynamic / proximity acceleration near encounters
+                particles.forEach((p, idx) => {
+                    if (idx !== index) {
+                        let dTheta = (p.theta - this.theta) % (Math.PI * 2);
+                        if (dTheta < 0) dTheta += Math.PI * 2;
+                        if (dTheta < 0.35 || dTheta > (Math.PI * 2 - 0.35)) {
+                            // Acceleration near encounter
+                            this.theta += speedMultiplier * 0.45;
+                        }
+                    }
+                });
+
+                // Target position on ring
+                let targetX = center.x + Math.cos(this.theta) * trapRadius;
+                let targetY = center.y + Math.sin(this.theta) * trapRadius;
+
+                // Mouse perturbation (Laser optical gradient kick)
+                if (mouse.active) {
+                    let dx = mouse.x - targetX;
+                    let dy = mouse.y - targetY;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 150) {
+                        let force = (150 - dist) / 150;
+                        targetX -= (dx / dist) * force * 40;
+                        targetY -= (dy / dist) * force * 40;
+                    }
+                }
+
+                this.x = targetX;
+                this.y = targetY;
+
+                // Trail recording
+                this.trail.push({ x: this.x, y: this.y });
+                if (this.trail.length > 25) this.trail.shift();
+            }
+
+            draw() {
+                // Draw trailing wave
+                for (let i = 0; i < this.trail.length; i++) {
+                    let alpha = (i / this.trail.length) * 0.4;
+                    ctx.beginPath();
+                    ctx.arc(this.trail[i].x, this.trail[i].y, this.radius * (i / this.trail.length), 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(56, 189, 248, ${alpha})`;
+                    ctx.fill();
+                }
+
+                // Core particle
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#ffffff';
+                ctx.shadowColor = '#38bdf8';
+                ctx.shadowBlur = 18;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        let particles = [];
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < numParticles; i++) {
+                particles.push(new Particle((i * (Math.PI * 2)) / numParticles));
+            }
+        }
+        initParticles();
+
+        // Background decorative optical vortex intensity ring
+        function drawTrapRing() {
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(center.x, center.y, trapRadius, 0, Math.PI * 2);
+            ctx.lineWidth = 14;
+            ctx.strokeStyle = 'rgba(56, 189, 248, 0.06)';
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(center.x, center.y, trapRadius, 0, Math.PI * 2);
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
+            ctx.shadowColor = '#38bdf8';
+            ctx.shadowBlur = 15;
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        // Animation Loop
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+
+            drawTrapRing();
+
+            particles.forEach((p, idx) => {
+                p.update(particles, idx);
+                p.draw();
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
 </body>
 </html>
